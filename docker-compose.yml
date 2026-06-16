@@ -1,0 +1,48 @@
+version: '3.8'
+
+services:
+  db:
+    image: timescale/timescaledb:latest-pg16
+    ports:
+      - '5432:5432'
+    environment:
+      POSTGRES_DB: orr_pulse
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - ./db/migrations:/docker-entrypoint-initdb.d
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U postgres']
+      interval: 5s
+      timeout: 3s
+      retries: 5
+
+  ingestor:
+    build:
+      context: .
+      dockerfile: apps/ingestor/Dockerfile
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: postgres://ingestor_rw:ingestor_pass@db:5432/orr_pulse
+      TOMTOM_API_KEY: ${TOMTOM_API_KEY:-}
+      TOMTOM_MOCK: ${TOMTOM_MOCK:-true}
+    restart: unless-stopped
+
+  web:
+    build:
+      context: .
+      dockerfile: apps/web/Dockerfile
+    depends_on:
+      db:
+        condition: service_healthy
+    ports:
+      - '3000:3000'
+    environment:
+      DATABASE_URL: postgres://web_ro:web_pass@db:5432/orr_pulse
+    restart: unless-stopped
+
+volumes:
+  pgdata:

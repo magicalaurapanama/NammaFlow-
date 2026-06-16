@@ -1,0 +1,35 @@
+{
+  "name": "orr-pulse",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Real-time traffic monitoring dashboard for Bengaluru's Outer Ring Road",
+  "workspaces": [
+    "apps/web",
+    "apps/ingestor",
+    "packages/shared"
+  ],
+  "scripts": {
+    "lint": "eslint .",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "seed": "npx tsx db/seed.ts"
+  },
+  "devDependencies": {
+    "@types/pg": "^8.20.0",
+    "eslint": "^9.0.0",
+    "fast-check": "^3.22.0",
+    "prettier": "^3.4.0",
+    "tsx": "^4.22.4",
+    "typescript": "^5.6.0",
+    "vitest": "^2.1.0"
+  },
+  "engines": {
+    "node": ">=20.0.0"
+  },
+  "dependencies": {
+    "pg": "^8.21.0"
+  }
+}
